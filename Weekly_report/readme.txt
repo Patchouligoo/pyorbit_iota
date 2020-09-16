@@ -1,1 +1,1 @@
-This folder contains the weekly report since June
+This folder contains the progressive report since June
