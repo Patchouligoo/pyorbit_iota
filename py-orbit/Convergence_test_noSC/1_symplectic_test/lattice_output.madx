@@ -1,0 +1,20 @@
+CALL, FILE = iota.seq;
+
+
+
+BEAM, PARTICLE = proton, ENERGY = 0.94077, SEQUENCE = iota;
+use, sequence=iota;
+
+
+
+SELECT, FLAG = TWISS, COLUMN = NAME, S, BETX, ALFX, DX, DPX, BETY, ALFY;
+TWISS, FILE = "output.out";
+
+PLOT, HAXIS = S, VAXIS = DX;
+PLOT, HAXIS = S, VAXIS = BETX;
+PLOT, HAXIS = S, VAXIS = BETY;
+
+QUIT;
+
+
+
