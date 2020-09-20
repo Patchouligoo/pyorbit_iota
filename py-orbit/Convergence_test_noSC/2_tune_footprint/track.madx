@@ -1,0 +1,66 @@
+CALL, FILE = iota_oct4_madx.seq;
+
+
+
+BEAM, PARTICLE = proton, ENERGY = 0.94077, SEQUENCE = iota;
+use, sequence=iota;
+
+
+
+SELECT, FLAG = TWISS, COLUMN = NAME, S, BETX, ALFX, DX, DPX, BETY, ALFY;
+TWISS, FILE = "output.out";
+
+
+SELECT,FLAG=MAKETHIN, CLASS=QUADRUPOLE, SLICE=32;
+SELECT,FLAG=MAKETHIN, CLASS=SBEND, SLICE=32;
+SELECT,FLAG=MAKETHIN, CLASS=SEXTUPOLE,SLICE=32;
+SELECT,FLAG=MAKETHIN, CLASS=DIPEDGE,  SLICE=1;
+
+MAKETHIN, SEQUENCE=IOTA;
+
+USE, SEQUENCE=IOTA;
+
+
+alphax = 5.378281542e-09;
+alphay = 5.27404231e-09;
+B0X:=0.7905949642 ;
+B0Y:=1.163203072 ;
+EX = 4.016e-6;
+EY = 4.016e-6;
+gx = (1 + alphax*alphax)/B0X;
+gy = (1 + alphay*alphay)/B0Y;
+
+
+SX:=(EX*B0X)^0.5;    // rms beam size at the start, the observation location
+SPX:=(EX*gx)^0.5;
+SY:=(EY*B0Y)^0.5;    // rms beam size at the start, the observation location
+SPY:=(EX*gy)^0.5;
+
+value, SX;
+value, SY;
+
+
+TRACK, FILE = basis, DUMP, ONETABLE;
+
+i = 0;
+while (i < 100) {
+    j = 0;
+    while (j < 100) {
+
+        x = ((i + 1) / 100) * 5 * SX;
+        y = ((j + 1) / 100) * 5 * SY;
+
+        START, X = x, Y = y;
+
+        j = j + 1;
+    }
+    i = i + 1;
+}
+
+
+DYNAP, TURNS=5000, FASTUNE=TRUE;
+
+ENDTRACK;
+
+
+WRITE, TABLE=DYNAPTUNE, FILE;
