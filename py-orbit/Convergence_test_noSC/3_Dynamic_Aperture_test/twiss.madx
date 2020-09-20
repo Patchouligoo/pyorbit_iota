@@ -1,0 +1,70 @@
+//--------------------------call the iota file----------------------------
+
+CALL, FILE = iota_oct4_madx.seq;
+
+
+
+
+//----------------------------get twiss plot---------------------------
+
+BEAM, PARTICLE = proton, ENERGY = 0.94077, SEQUENCE = iota;
+
+USE, SEQUENCE = iota;
+
+
+
+SELECT, FLAG = TWISS, COLUMN = NAME, S, BETX, ALFX, DX, DPX, BETY, ALFY;
+TWISS;
+
+
+
+SELECT,FLAG=MAKETHIN, CLASS=QUADRUPOLE, SLICE=8;
+SELECT,FLAG=MAKETHIN, CLASS=SBEND, SLICE=8;
+SELECT,FLAG=MAKETHIN, CLASS=SEXTUPOLE,SLICE=8;
+SELECT,FLAG=MAKETHIN, CLASS=DIPEDGE,  SLICE=1;
+
+MAKETHIN, SEQUENCE=iota;
+
+USE, SEQUENCE=iota;
+
+
+alphax = 5.378281542e-09;
+betax = 0.7905949642;
+alphay = 5.27404231e-09;
+betay = 1.163203072;
+emitlimx = 4.016e-6;
+emitlimy = 4.016e-6;
+gx = (1 + alphax*alphax)/betax;
+gy = (1 + alphay*alphay)/betay;
+
+
+
+SX:=(emitlimx*betax)^0.5;    // rms beam size at the start, the observation location
+SY:=(emitlimy*betay)^0.5;    // rms beam size at the start, the observation location
+
+value, SX;
+value, SY;
+
+
+TRACK, FILE = basis, DUMP, ONETABLE, APERTURE=true;
+
+
+m = 0;
+while (m < 50) {
+    l = 0;
+    while (l < 100) {
+        l = l + 1;
+        START, X = l/100 * SX * 10 * cos(m/50 * pi/2), Y = l/100 * SX * 10 * sin(m/50 * pi/2), PT = 0.000193; //.000193
+    }
+    m = m + 1;
+}
+
+
+RUN,TURNS=10000, MAXAPER = {1e10, 1e10, 1e10, 1e10, 1e10, 1e10};
+ENDTRACK;
+
+
+WRITE, TABLE=trackone, FILE=track6D_1p;
+
+
+stop ;
