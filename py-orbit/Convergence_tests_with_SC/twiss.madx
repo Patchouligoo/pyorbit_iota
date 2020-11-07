@@ -1,0 +1,18 @@
+//--------------------------call the iota file----------------------------
+
+CALL, FILE = iota_linear.seq;
+
+
+
+
+//----------------------------get twiss plot---------------------------
+
+BEAM, PARTICLE = proton, ENERGY = 0.94077, SEQUENCE = iota;
+
+USE, SEQUENCE = iota;
+
+
+
+SELECT, FLAG = TWISS, COLUMN = NAME, S, BETX, ALFX, DX, DPX, BETY, ALFY;
+TWISS, FILE = output.out;
+
