@@ -1,0 +1,21 @@
+CALL, FILE = iota_linear.seq;
+
+
+
+BEAM, PARTICLE = PROTON, ENERGY = 0.94077, SEQUENCE = iota;
+use, sequence=iota;
+
+
+MATCH,SEQUENCE=IOTA;
+GLOBAL,SEQUENCE=IOTA, Q1=5.31,Q2=5.32;
+VARY, NAME= kq01, STEP=1.E-6;
+VARY, NAME= kq03, STEP=1.E-6;
+LMDIF, CALLS=500, TOLERANCE=1.0E-24;
+ENDMATCH;
+
+
+SELECT, FLAG = TWISS, COLUMN = NAME, S, BETX, ALFX, DX, DPX, BETY, ALFY;
+TWISS, FILE = "output_shifted.out";
+
+
+save, sequence = iota, file = 'iota_linear_shifted.seq';
