@@ -497,8 +497,8 @@ class _teapotFactory:
 			elem.addParam("start",start_turn)
 			elem.addParam("end",end_turn)
 
-		# ===========QUAD quadrupole element =====================
-		if(madElem.getType().lower()  == "quad_kicker"):
+		# ===========QUAD Kicker element =====================
+		if(madElem.getType().lower()  == "quadkicker"):
 			elem = Quad_Kicker_TEAPOT(madElem.getName())
 			kq = 0.
 			if(params.has_key("k1")):
@@ -1458,64 +1458,11 @@ class Quad_Kicker_TEAPOT(NodeTEAPOT):
 		NodeTEAPOT.__init__(self,name)
 
 		self.addParam("kq",0.)
-		self.addParam("poles",[])
-		self.addParam("kls",[])
-		self.addParam("skews",[])
 		self.addParam("start",-1)
 		self.addParam("end",-1)
 		self.setnParts(8)
 
-		def fringeIN(node,paramsDict):
-			usageIN = node.getUsage()		
-			if(not usageIN):
-				return
-			kq = node.getParam("kq")
-			poleArr = node.getParam("poles")
-			klArr = node.getParam("kls")
-			skewArr = node.getParam("skews")
-			length = paramsDict["parentNode"].getLength()
-			bunch = paramsDict["bunch"]
-			useCharge = 1
-			if(paramsDict.has_key("useCharge")): useCharge = paramsDict["useCharge"]
-			TPB.quadfringeIN(bunch,kq,useCharge)
-			if(length == 0.):
-				return
-			for i in xrange(len(poleArr)):
-				pole = poleArr[i]
-				kl = klArr[i]
-				skew = skewArr[i]
-				TPB.multpfringeIN(bunch,pole,kl/length,skew,useCharge)
-
-		def fringeOUT(node,paramsDict):
-			usageOUT = node.getUsage()
-			if(not usageOUT):
-				return
-			kq = node.getParam("kq")
-			poleArr = node.getParam("poles")
-			klArr = node.getParam("kls")
-			skewArr = node.getParam("skews")
-			length = paramsDict["parentNode"].getLength()
-			bunch = paramsDict["bunch"]
-			useCharge = 1
-			if(paramsDict.has_key("useCharge")): useCharge = paramsDict["useCharge"]
-			TPB.quadfringeOUT(bunch,kq,useCharge)
-			if(length == 0.):
-				return
-			for i in xrange(len(poleArr)):
-				pole = poleArr[i]
-				kl = klArr[i]
-				skew = skewArr[i]
-				TPB.multpfringeOUT(bunch,pole,kl/length,skew,useCharge)
-
-		self.setFringeFieldFunctionIN(fringeIN)
-		self.setFringeFieldFunctionOUT(fringeOUT)
-		self.getNodeTiltIN().setType("quad tilt in")
-		self.getNodeTiltOUT().setType("quad tilt out")
-		self.getNodeFringeFieldIN().setType("quad fringe in")
-		self.getNodeFringeFieldOUT().setType("quad fringe out")
-
-		self.setType("quad kicker teapot")
-
+		
 	def initialize(self):
 		"""
 		The  Quad Combined Function TEAPOT class implementation
@@ -1551,14 +1498,11 @@ class Quad_Kicker_TEAPOT(NodeTEAPOT):
 		end_turn = self.getParam("end")
 
 		if curr_turn >= start_turn and curr_turn <= end_turn :
-
 			nParts = self.getnParts()
 			index = self.getActivePartIndex()
 			length = self.getLength(index)
 			kq = self.getParam("kq")
-			poleArr = self.getParam("poles")
-			klArr = self.getParam("kls")
-			skewArr = self.getParam("skews")
+			
 			bunch = paramsDict["bunch"] 
 			useCharge = 1
 			if(paramsDict.has_key("useCharge")): useCharge = paramsDict["useCharge"]
@@ -1573,7 +1517,10 @@ class Quad_Kicker_TEAPOT(NodeTEAPOT):
 			return
 
 		else:
-			return
+			index = self.getActivePartIndex()
+			bunch = paramsDict["bunch"] 
+			length = self.getLength(index)
+			TPB.drift(bunch, length)
 
 
 class KickTEAPOT(NodeTEAPOT):
@@ -1656,7 +1603,11 @@ class KickTEAPOT(NodeTEAPOT):
 			return
 
 		else:
-			return
+			index = self.getActivePartIndex()
+			bunch = paramsDict["bunch"] 
+			length = self.getLength(index)
+			TPB.drift(bunch, length)
+
 
 	def setWaveform(self, waveform):
 		"""
